@@ -1,4 +1,4 @@
-# Proiect PO Faza 1
+# Proiect POO Faza 1
 ## Aplicatie Dezastre naturale
 
 

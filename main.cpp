@@ -227,8 +227,6 @@ class Interventie {
         bool disponibilitate;
     public:
 
-        friend class String;
-
         Interventie() : echipa(""), persoana_contact(""), nr_persoane(0), disponibilitate(false) {}
 
         Interventie(const Interventie& copie) {

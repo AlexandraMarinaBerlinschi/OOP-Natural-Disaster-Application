@@ -9,9 +9,6 @@ class String{
     char* sir;
 
 public:
-    friend class Locatie;
-    friend class Dezastru;
-    friend class Interventie;
 
     String ()
     {
@@ -87,8 +84,6 @@ class Locatie {
     String name;
 public:
 
-    friend class String;
-
     Locatie() : name(""), latitudine(0), longitudine(0), lat1(0), lat2(0), long1(0), long2(0), distanta_lat(0), distanta_long(0), distanta(0), calcul1(0), calcul2(0) {}
 
     Locatie(const Locatie& copie) {
@@ -161,8 +156,6 @@ class Dezastru {
     int nivel_pericol;
 
 public:
-
-     friend class String;
 
     Dezastru() : tip(""), nr_victime(0), nivel_dez(0), nivel_pericol(0) {}
 

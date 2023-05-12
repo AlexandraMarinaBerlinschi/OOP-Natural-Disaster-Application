@@ -1,90 +1,25 @@
 #include <iostream>
-#include <cstring>
 #include <cmath>
+#include <exception>
+#include <string>
+#include <vector>
 
 using namespace std;
 
-class String{
-    int size;
-    char* sir;
-
-public:
-
-    String ()
-    {
-        size = 0;
-        sir = nullptr;
-    }
-    String(const char* s)
-    {
-        size = strlen(s);
-        sir = new char[size+1];
-        strcpy(sir, s);
-        sir[size] = '\0';
-
-    }
-
-    String(const String& s)
-    {
-        this->size = s.size;
-        this->sir = new char[size+1];
-        strcpy(sir, s.sir);
-    }
-
-    String& operator=(const String& a)
-    {
-        if ( this != &a ) {
-            delete[] sir;
-
-            size = a.size;
-            sir = new char[size+1];
-            strcpy(sir, a.sir);
-            sir[size] = '\0';
-        }
-
-        return *this;
-    }
-
-    char* get_sir()
-    {
-        return sir;
-    }
-
-    ~String()
-    {
-        if (sir != nullptr)
-            delete[] sir;
-    }
-
-    friend ostream& operator << (ostream& out, const String& s){
-        out << s.sir;
-        return out;
-    }
-
-    friend istream& operator>>(istream& in, String& s) {
-        string temp;
-        in >> temp;
-        s.size = temp.length();
-        s.sir = new char[s.size + 1];
-        strcpy(s.sir, temp.c_str());
-        return in;
-    }
-
-};
-
 class Locatie {
-    String nume;
+    string nume;
     float latitudine;
     float longitudine;
     double lat1, lat2;
     double long1, long2;
     double distanta_lat,distanta_long;
-    double distanta;
     double calcul1,calcul2;
-    String name;
+    string name;
+    double distanta;
+
 public:
 
-    Locatie() : name(""), latitudine(0), longitudine(0), lat1(0), lat2(0), long1(0), long2(0), distanta_lat(0), distanta_long(0), distanta(0), calcul1(0), calcul2(0) {}
+    Locatie() : latitudine(0), longitudine(0), lat1(0), lat2(0), long1(0), long2(0), distanta_lat(0), distanta_long(0), distanta(0), calcul1(0), calcul2(0) {}
 
     Locatie(const Locatie& copie) {
         latitudine=copie.latitudine;
@@ -102,7 +37,7 @@ public:
         name=copie.name;
     }
 
-    String getNume() {
+    string getNume() {
         return nume;
     }
     float getLatitudine() const {
@@ -129,7 +64,6 @@ public:
 
         return distanta;
     }
-
 };
 
     istream& operator >> (istream& in, Locatie& loc) { // citesc locatia prin coordonate astfel incat sa o transform in km
@@ -149,15 +83,17 @@ public:
     }
 
 class Dezastru {
-    private:
-    String tip;
+
+    string tip;
     int nr_victime;
     int nivel_dez;
+
+protected:
     int nivel_pericol;
 
 public:
 
-    Dezastru() : tip(""), nr_victime(0), nivel_dez(0), nivel_pericol(0) {}
+    Dezastru() : nr_victime(0), nivel_dez(0), nivel_pericol(0) {}
 
     Dezastru(const Dezastru& copie) {
         this->tip=copie.tip;
@@ -176,25 +112,39 @@ public:
         return *this;
     }
 
-    friend istream& operator >> (istream& in, Dezastru& info);
+protected:
 
     int Calcul_nivel() { // calculez nivelul de pericol al dezastrului pe baza numarului de victime si a nivelului de dezastru
-        if (nr_victime>=100) {
+        if (nr_victime >= 100) {
             nivel_pericol += 4;
-        }else if (nr_victime>=50) {
+        } else if (nr_victime >= 50) {
             nivel_pericol += 3;
-        }else if (nr_victime>=20) {
+        } else if (nr_victime >= 20) {
             nivel_pericol += 2;
-        }else nivel_pericol += 1;
+        } else nivel_pericol += 1;
 
-        if(nivel_dez>=100) {
+        if (nivel_dez >= 100) {
             nivel_pericol += 4;
-        }else if (nivel_dez>=50) {
+        } else if (nivel_dez >= 50) {
             nivel_pericol += 3;
-        }else if (nivel_dez>=25) {
+        } else if (nivel_dez >= 25) {
             nivel_pericol += 2;
-        }else nivel_pericol += 1;
+        } else nivel_pericol += 1;
+    }
 
+    friend istream& operator >> (istream &in, Dezastru &info) { // citesc informatiile despre dezastru
+        cout << "Numarul victimelor: ";
+        in >> info.nr_victime;
+        cout << "Va rog alegeti nivelul dezastrului pe o scala de la 1 la 100: ";
+        in >> info.nivel_dez;
+        cout << "................................................................."<<endl;
+
+        return in;
+    }
+
+public:
+
+    int Nivel_pericol() const { // calculez nivelul de pericol al dezastrului pe baza nivelului de pericol
 
         if ( nivel_pericol >= 7) { // afisez nivelul de pericol al dezastrului
             cout<<"Nivel ridicat de pericol"<<endl;
@@ -209,69 +159,298 @@ public:
         return nivel_pericol;
     }
 };
-    istream& operator >> (istream &in, Dezastru &info) { // citesc informatiile despre dezastru
-        cout << "Numarul victimelor: ";
-        in >> info.nr_victime;
-        cout << "Va rog alegeti nivelul dezastrului pe o scala de la 1 la 100: ";
-        in >> info.nivel_dez;
 
-        return in;
+
+class Cutremur : public Dezastru {
+
+    int magnitudine;
+    bool tsunami;
+
+public:
+
+    Cutremur() : Dezastru(), magnitudine(0), tsunami(false) {}
+
+    Cutremur(const Cutremur& copie) : Dezastru(copie) {
+        this->magnitudine = copie.magnitudine;
+        this->tsunami = copie.tsunami;
     }
+
+    friend istream& operator>>(istream& in, Cutremur& info);
+
+    int Calcul_nivel() {
+        Dezastru::Calcul_nivel(); // calculez nivelul de pericol al dezastrului prin apelarea functiei din clasa de baza
+
+        if(magnitudine >= 8) {
+            nivel_pericol += 5;
+        }else if(magnitudine >= 6) {
+            nivel_pericol += 4;
+        }else if(magnitudine >= 4) {
+            nivel_pericol += 3;
+        }else if(magnitudine >= 2) {
+            nivel_pericol += 2;
+        }else {
+            nivel_pericol += 1;
+        }
+
+        if (tsunami) {
+            nivel_pericol += 4;
+        }
+
+        return nivel_pericol;
+    }
+
+};
+
+istream& operator>>(istream& in, Cutremur& info) {
+    cout << "Intensitatea cutremurului (scala Richter): ";
+    in >> info.magnitudine;
+    cout << "A fost generat tsunami? (1 pentru da, 0 pentru nu): ";
+    in >> info.tsunami;
+
+    return in;
+}
+
+class Incendiu : public Dezastru {
+private:
+    bool gaze_naturale;
+    bool substante_chimice;
+    bool echipamente_electrice;
+
+public:
+    Incendiu() : Dezastru(), gaze_naturale(false), substante_chimice(false), echipamente_electrice(false) {}
+    Incendiu(const Incendiu& incendiu) : Dezastru(incendiu), gaze_naturale(incendiu.gaze_naturale), substante_chimice(incendiu.substante_chimice), echipamente_electrice(incendiu.echipamente_electrice) {}
+
+    friend istream& operator >> (istream& in, Incendiu& incendiu);
+
+    int Calcul_nivel() {
+        Dezastru::Calcul_nivel();
+
+        if (gaze_naturale) {
+            nivel_pericol += 2;
+        }
+        if (substante_chimice) {
+            nivel_pericol += 3;
+        }
+        if (echipamente_electrice) {
+            nivel_pericol += 1;
+        }
+
+        return nivel_pericol;
+    }
+};
+
+istream& operator >> (istream& in, Incendiu& incendiu) {
+    cout << "Existenta gazelor naturale (0 - nu, 1 - da): ";
+    in >> incendiu.gaze_naturale;
+    cout << "Existenta substantelor chimice (0 - nu, 1 - da): ";
+    in >> incendiu.substante_chimice;
+    cout << "Existenta echipamentelor electrice (0 - nu, 1 - da): ";
+    in >> incendiu.echipamente_electrice;
+
+    return in;
+}
 
 class Interventie {
 
-    private:
-        String echipa;
-        String persoana_contact;
-        int nr_persoane;
-        bool disponibilitate;
-    public:
+protected:
+    string echipa;
+    string persoana_contact;
+    int nr_persoane;
+    bool disponibilitate;
 
-        Interventie() : echipa(""), persoana_contact(""), nr_persoane(0), disponibilitate(false) {}
+public:
+    Interventie(const string& echipa, const string& persoana_contact, int nr_persoane, bool disponibilitate)
+            : echipa(echipa), persoana_contact(persoana_contact), nr_persoane(nr_persoane), disponibilitate(disponibilitate) {}
 
-        Interventie(const Interventie& copie) {
-            this->echipa=copie.echipa;
-            this->persoana_contact=copie.persoana_contact;
-            this->nr_persoane=copie.nr_persoane;
-            this->disponibilitate=copie.disponibilitate;
+    Interventie () {
+        echipa = "";
+        persoana_contact = "";
+        nr_persoane = 0;
+        disponibilitate = false;
+    }
+    void Verificare_disponibilitate() {
+        if (disponibilitate) {
+            cout << echipa << " este disponibila" << endl;
+            cout << "Persoana de contact este " << persoana_contact << endl;
+            cout << "Numarul de persoane disponibile este " << nr_persoane << endl;
+        } else {
+            cout << echipa << " nu este disponibila" << endl;
         }
-
-        Interventie& operator=(const Interventie& copie) {
-            if (this != &copie) {
-                echipa = copie.echipa;
-                persoana_contact = copie.persoana_contact;
-                nr_persoane = copie.nr_persoane;
-                disponibilitate = copie.disponibilitate;
-            }
-            return *this;
-        }
-
-
-    void setEchipa(const String& echipa) { // setez datele despre echipa de interventie
-        this->echipa = echipa;
+        cout<<"................................................................."<<endl;
     }
-
-    void setPersoanaContact(const String& persoana_contact) {
-        this->persoana_contact = persoana_contact;
-    }
-
-    void setNrPersoane(int nr_persoane) {
-        this->nr_persoane = nr_persoane;
-    }
-
-    void setDisponibilitate(bool disponibilitate) {
-        this->disponibilitate = disponibilitate;
-    }
-
-
-        void Verificare_disponibilitate() { // verific daca echipa de interventie este disponibila
-            if (disponibilitate) { // daca echipa de interventie este disponibila, afisez datele despre aceasta
-                cout<<echipa<<" este disponibila"<<endl;
-                cout<<"Persoana de contact este "<<persoana_contact<<endl;
-                cout<<"Numarul de persoane disponibile este "<<nr_persoane<<endl;
-            }else cout<<echipa<<" nu este disponibila"<<endl;
-        }
 };
+
+class Pompieri : public Interventie {
+
+private:
+    int capacitate_pompieri;
+    bool autospeciala;
+
+public:
+    Pompieri(const string& echipa, const string& persoana_contact, int nr_persoane, bool disponibilitate, int capacitate_pompieri, bool autospeciala)
+            : Interventie(echipa, persoana_contact, nr_persoane, disponibilitate), capacitate_pompieri(capacitate_pompieri), autospeciala(autospeciala) {}
+
+    Pompieri() {
+        echipa = "";
+        capacitate_pompieri = 0;
+        autospeciala = false;
+    }
+
+    void Verificare_disponibilitate() {
+        if (disponibilitate) {
+            cout << echipa << " este disponibila pentru interventii la incendiu" << endl;
+            cout << "Persoana de contact este " << persoana_contact << endl;
+            cout << "Numarul de pompieri disponibili este " << capacitate_pompieri << endl;
+            if (autospeciala) {
+                cout << "Echipa dispune de o autospeciala pentru interventii la incendiu" << endl;
+            } else {
+                cout << "Echipa nu dispune de o autospeciala pentru interventii la incendiu" << endl;
+            }
+        } else {
+            cout << echipa << " nu este disponibila pentru interventii la incendiu" << endl;
+        }
+        cout<<"................................................................."<<endl;
+    }
+};
+
+class Situatie {
+public:
+    virtual void Afectata(int damage) = 0;
+    virtual bool Distrusa() const { return false; }
+    virtual ~Situatie() {}
+};
+
+class Cladire : public Situatie {
+
+protected:
+    int viata;
+
+public:
+    Cladire(int viata) : viata(viata) {}
+
+    Cladire() {
+        viata = 100;
+    }
+
+    void Afectata(int damage) { //polimorfism - functia este suprascrisa
+        viata = viata - damage;
+    }
+
+    bool Distrusa() const {
+        return viata<= 0;
+    }
+
+    void verificare() const {
+        if (Distrusa()) {
+           cout << "Cladirea a fost distrusa!" << endl;
+        }
+        else {
+            cout << "Cladirea este inca in picioare!" << endl;
+        }
+    }
+
+};
+
+class CladireNesigura : public exception {
+private:
+    string mesaj;
+public:
+    CladireNesigura(const string& mesaj) : mesaj(mesaj) {}
+
+    const char* what() const throw() {
+        return mesaj.c_str();
+    }
+};
+
+class CladireSigura : public Cladire {
+private:
+    string stare;
+public:
+    CladireSigura(int viata): Cladire(viata), stare("sigura") {}
+
+    void Afectata(int damage) {
+        Cladire::Afectata(damage);
+        if (viata <= 0) {
+            stare = "nesigura";
+            throw CladireNesigura("Cladirea este nesigura!");
+        }
+    }
+    const string& get_stare() const {
+        return stare;
+    }
+};
+
+class Inundatie_exception : public exception {
+private:
+    string mesaj;
+public:
+    Inundatie_exception(const string& mesaj) : mesaj(mesaj) {}
+
+    const char* what() const throw() override {
+        return mesaj.c_str();
+    }
+};
+
+class InundatieMonitorizare {
+private:
+    int nivel_apa;
+public:
+    InundatieMonitorizare(int nivel_apa) : nivel_apa(nivel_apa) {}
+
+    InundatieMonitorizare() {
+        nivel_apa = 0;
+    }
+
+    void Verificare_nivel_apa() {
+        nivel_apa += 20;
+        try {
+            if (nivel_apa > 100) {
+                throw Inundatie_exception("Nivelul apei este prea mare!");
+            } else {
+                cout << "Nivelul apei este normal!" << endl;
+            }
+        }
+        catch (Inundatie_exception &e) {
+            cerr << "Eroare: " << e.what() << endl;
+            throw runtime_error("A aparut o problema in monitorizarea nivelului apei!");
+        }
+        catch (const exception &e) {
+            cerr << "Eroare: " << e.what() << endl;
+            throw runtime_error("Va rugam reincercati!");
+        }
+    }
+
+};
+
+class Total_Dezastre {
+private:
+    string nume;
+    int nivel_pericol;
+    int total;
+    int dezastre;
+    static vector<Total_Dezastre*> total_dezastre;
+public:
+    Total_Dezastre(string nume, int nivel_pericol) : nume(nume), nivel_pericol(nivel_pericol) {
+        total_dezastre.push_back(this);
+    }
+
+    static int get_total_dezastre() {
+        int total = 0;
+        for (const auto& dezastre : total_dezastre) {
+            total += dezastre->nivel_pericol;
+        }
+        return total;
+    }
+
+    static void Afisare() {
+        cout << "Dezastrele inregistrate sunt: "<< endl;
+        for (const auto& dezastre : total_dezastre) {
+            cout <<" - "<< dezastre->nume << " cu nivelul de pericol " << dezastre->nivel_pericol << endl;
+        }
+    }
+};
+
+vector<Total_Dezastre*> Total_Dezastre::total_dezastre;
 
 int main() {
     Locatie locatie1;
@@ -283,27 +462,75 @@ int main() {
     float distance = locatie1.Distanta_calculata(locatie2);
     cout<<locatie1<<endl;
 
-    Dezastru dezastru1;
 
+    Dezastru dezastru1;
     cin>>dezastru1;
 
-    int nivel = dezastru1.Calcul_nivel();
+    Cutremur cutremur;
+    cout<<"Introduceti datele pentru cutremur: "<<endl;
+    cin>>cutremur;
+    cutremur.Calcul_nivel();
+    cutremur.Nivel_pericol();
 
-    // ofer date despre echipa de interventie si verific daca aceasta este disponibila
-    Interventie interventie1;
-    interventie1.setEchipa("Echipa 1");
-    interventie1.setPersoanaContact("Andreea Pop");
-    interventie1.setNrPersoane(10);
-    interventie1.setDisponibilitate(true);
+    Incendiu incendiu;
+    cout<<"Introduceti datele pentru incendiu: "<<endl;
+    cin>>incendiu;
+    incendiu.Calcul_nivel();
+    incendiu.Nivel_pericol();
 
-    Interventie interventie2;
-    interventie2.setEchipa("Echipa 2");
-    interventie2.setPersoanaContact("Ion Marin");
-    interventie2.setNrPersoane(5);
-    interventie2.setDisponibilitate(false);
-
+    Interventie interventie1("Echipa1", "Popescu Ion", 10, true);
     interventie1.Verificare_disponibilitate();
-    interventie2.Verificare_disponibilitate();
+
+    Pompieri pompieri1("Echipa 1", "Ion Popescu", 5, true, 10, true);
+    Pompieri pompieri2("Echipa 2", "Maria Ionescu", 7, false, 15, false);
+
+    cout << "Detalii despre interventiile la incendiu:" << endl;
+    pompieri1.Verificare_disponibilitate();
+    cout << endl;
+    pompieri2.Verificare_disponibilitate();
+
+    Situatie* ptrCladire = new Cladire(100); //upcasting - pointerul de tip Situatie pointeaza catre un obiect de tip Cladire
+    auto* ptrCladire1 = dynamic_cast<Cladire*>(ptrCladire);
+    if(ptrCladire1){
+        ptrCladire1->verificare(); // polimorfism - se apeleaza metoda din clasa Cladire (clasa derivata) si nu din clasa Situatie (clasa de baza)
+    }
+    delete ptrCladire;
+
+    Situatie* ptrCladire_Sigura = new CladireSigura(100); //upcasting - pointerul de tip Situatie pointează către un obiect de tip Cladire_Rezidentiala
+    auto* ptrCladire_Sigura1 = dynamic_cast<CladireSigura*>(ptrCladire_Sigura);
+    if (ptrCladire_Sigura1) {
+        try {
+            ptrCladire_Sigura1->Afectata(50);
+            cout << "Starea curenta: " << ptrCladire_Sigura1->get_stare() << endl;
+            ptrCladire1->Afectata(60);
+            cout << "Starea curenta: " << ptrCladire_Sigura1->get_stare() << endl;
+        }
+        catch (const exception& e) {
+            cerr << "A aparut o exceptie: " << e.what() << endl;
+        }
+    }
+    delete ptrCladire_Sigura;
+
+    cout<<"------------------------------------------"<<endl;
+
+    try {
+        InundatieMonitorizare nivel(60);
+        nivel.Verificare_nivel_apa();
+        InundatieMonitorizare nivel2;
+        nivel2.Verificare_nivel_apa();
+    } catch (const exception& e) {
+        cerr << "Eroare: " << e.what() << endl;
+        return 1;
+    }
+
+    cout<<"------------------------------------------"<<endl;
+
+    Total_Dezastre dezastre1("Cutremur", 10);
+    Total_Dezastre dezastre2("Incendiu", 20);
+    Total_Dezastre dezastre3("Inundatie", 30);
+
+    cout<<"Nivelul total de pericol este: "<<Total_Dezastre::get_total_dezastre()<<endl;
+    Total_Dezastre::Afisare();
 
     return 0;
 }

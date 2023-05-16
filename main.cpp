@@ -3,6 +3,8 @@
 #include <exception>
 #include <string>
 #include <vector>
+#include <memory>
+#include <regex>
 
 using namespace std;
 
@@ -378,6 +380,13 @@ public:
     const string& get_stare() const {
         return stare;
     }
+
+};
+class CladireSiguraFactory {
+public:
+    static unique_ptr<Situatie> CreeazaCladireSigura(int viata) {
+        return make_unique<CladireSigura>(viata);
+    }
 };
 
 class Inundatie_exception : public exception {
@@ -452,6 +461,77 @@ public:
 
 vector<Total_Dezastre*> Total_Dezastre::total_dezastre;
 
+class Manager {
+private:
+    string Dezastru_curent;
+    Manager() {}
+public:
+    static Manager& get_instance() {
+        static Manager instance;
+        return instance;
+    }
+
+    void set_dezastru_curent(const string& dezastru) {
+        Dezastru_curent = dezastru;
+    }
+
+    void Afisare_dezastru_curent() {
+        cout << "Dezastrul curent este: " << Dezastru_curent << endl;
+    }
+};
+class Intensitate {
+private:
+    vector<int> intensitatiCutremur;
+
+public:
+    Intensitate(const vector<int>& intensitati) : intensitatiCutremur(intensitati) {}
+
+    void Afisare_Intensitate() {
+        vector<int> intensitatiSortate = intensitatiCutremur;
+        sort(intensitatiSortate.begin(), intensitatiSortate.end());
+
+        cout << "Intensitati cutremure sortate: ";
+        for (const auto& intensitate : intensitatiSortate) {
+            cout << intensitate << " ";
+        }
+        cout << endl;
+    }
+
+    bool ExistaIntensitateMare(int limita) {
+        return any_of(intensitatiCutremur.begin(), intensitatiCutremur.end(), [limita](int intensitate) {
+            return intensitate > limita;
+        });
+    }
+};
+
+class SimulareDamage {
+    shared_ptr<Cladire> cladire;
+    int viata_initiala;
+public:
+
+    SimulareDamage(int viata_initiala) : cladire(make_shared<Cladire>(viata_initiala)) {}
+
+    void Afectare(int damage) {
+        cladire->Afectata(damage);
+        cladire->verificare();
+    }
+};
+
+class Apel {
+    string nr_telefon;
+public:
+    static bool VerificareNumar(const string& nr_telefon) {
+       regex Pattern("07[0-9]{8}");
+       if (regex_match(nr_telefon, Pattern)) {
+           cout<<"Numarul de telefon "<<nr_telefon<<" este valid!"<<endl;
+           return true;
+       }else {
+           cout<<"Numarul de telefon "<<nr_telefon<<" nu este valid!"<<endl;
+           return false;
+       }
+    }
+};
+
 int main() {
     Locatie locatie1;
     Locatie locatie2;
@@ -461,7 +541,6 @@ int main() {
 
     float distance = locatie1.Distanta_calculata(locatie2);
     cout<<locatie1<<endl;
-
 
     Dezastru dezastru1;
     cin>>dezastru1;
@@ -532,5 +611,41 @@ int main() {
     cout<<"Nivelul total de pericol este: "<<Total_Dezastre::get_total_dezastre()<<endl;
     Total_Dezastre::Afisare();
 
+    cout<<"------------------------------------------"<<endl;
+
+    Manager &manager = Manager::get_instance();
+
+    manager.set_dezastru_curent("Cutremur");
+    manager.Afisare_dezastru_curent();
+
+    Manager &manager1 = Manager::get_instance();
+    manager1.Afisare_dezastru_curent();
+
+    vector<int> intensitati = {5, 8, 3, 10, 6};
+    Intensitate intens(intensitati);
+    intens.Afisare_Intensitate();
+
+    int limita = 7;
+    if (intens.ExistaIntensitateMare(limita)) {
+        cout << "Exista cel putin o intensitate de cutremur mai mare decat " << limita << endl;
+    } else {
+        cout << "Nu exista intensitati de cutremur mai mari decat " << limita << endl;
+    }
+    cout<<"------------------------------------------"<<endl;
+
+    int viata_initiala = 100;
+    SimulareDamage simulare(viata_initiala);
+    simulare.Afectare(50);
+    simulare.Afectare(60);
+    cout<<"------------------------------------------"<<endl;
+
+    string nr_telefon = "0740123456";
+    Apel::VerificareNumar(nr_telefon);
+
+    string nr_telefon1 = "004012345";
+    Apel::VerificareNumar(nr_telefon1);
+
     return 0;
 }
+
+

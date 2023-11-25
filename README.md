@@ -37,4 +37,4 @@ Clasele implementate sunt urmatoarele:
 [PlGd]: <https://github.com/joemccann/dillinger/tree/master/plugins/googledrive/README.md>
 [PlOd]: <https://github.com/joemccann/dillinger/tree/master/plugins/onedrive/README.md>
 [PlMe]: <https://github.com/joemccann/dillinger/tree/master/plugins/medium/README.md>
-[PlGa]: <https://github.com/RahulHP/dillinger/blob/master/plugins/googleanalytics/README.md>](https://drive.google.com/file/d/1zb8xuXA2gmnbeheva0CBtQrlR3yOR4s4/view?usp=drive_link)
+

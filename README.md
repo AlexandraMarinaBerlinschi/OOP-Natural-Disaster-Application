@@ -1,4 +1,4 @@
-## Proiect POO 
+## Proiect POO ( Programare Orientata pe Obiecte )
 ## Aplicatie Dezastre naturale
 
 
